@@ -1,16 +1,72 @@
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BADY Saga - قلعة خصبة 7113</title>
+<title>BADY 7113 - ذاكرة قلعة الجردة</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<style>body{background:#0f172a;color:#fff;text-align:center;padding:20px;font-family:sans-serif}.card{background:#1e293b;padding:25px;border-radius:20px;margin-top:30px}button{background:#38bdf8;border:none;padding:15px 30px;border-radius:12px;font-weight:bold;font-size:18px;width:100%}</style>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Cairo',sans-serif}
+body{background:#070e1a;color:white} #app{max-width:440px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column}
+.header{padding:12px 16px;display:flex;justify-content:space-between;background:#0f172a;border-bottom:1px solid #38bdf840;position:sticky;top:0}
+.card{background:linear-gradient(180deg,#1e293b,#0f172a);border-radius:20px;padding:18px;border:1px solid #334155;text-align:center;margin:12px}
+.btn{width:100%;background:linear-gradient(90deg,#38bdf8,#22d3ee);color:#0b1220;border:none;border-radius:12px;padding:13px;font-weight:800;cursor:pointer}
+.btn2{background:transparent;color:#38bdf8;border:1px solid #38bdf8;margin-top:8px}
+.badge{background:rgba(56,189,248,0.12);color:#38bdf8;border:1px solid rgba(56,189,248,0.25);padding:3px 9px;border-radius:20px;font-size:11px}
+.demand{background:#0f172a;border:1px solid #1e293b;border-radius:14px;padding:12px;margin:8px 0;text-align:right}
+.demand.featured{border-color:#38bdf8}.demand.done{border-color:#22c55e;background:rgba(34,197,94,0.12)}
+.progress-bg{width:100%;height:8px;background:#0b1220;border-radius:10px;overflow:hidden;margin:8px 0}
+.progress-fill{height:100%;background:#38bdf8;width:0%}
+.castle-btn{width:110px;height:110px;margin:14px auto;background:radial-gradient(circle,#334155,#0f172a);border:3px solid #38bdf8;border-radius:50%;font-size:48px;display:flex;align-items:center;justify-content:center}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}.cell{aspect-ratio:1;background:#0f172a;border-radius:12px;border:2px solid #1e293b;display:flex;align-items:center;justify-content:center;font-size:28px}
+.cell.enemy{background:#7f1d1d;border-color:#ef4444}
+#catchArea{position:relative;width:100%;height:260px;background:#0f172a;border-radius:14px;border:1px solid #334155;overflow:hidden}
+.fall{position:absolute;font-size:22px}
+.maze{display:grid;grid-template-columns:repeat(5,1fr);gap:3px;margin:10px auto;width:240px}.mcell{aspect-ratio:1;border-radius:5px;display:flex;align-items:center;justify-content:center}
+.wall{background:#1e293b}.path{background:#0f172a;border:1px solid #1e293b}.player{background:#38bdf8}.goal{background:#22c55e}
+.quizOpt{background:#0f172a;border:1px solid #334155;border-radius:10px;padding:10px;margin:5px 0;text-align:right;cursor:pointer}
+.bossBar{width:100%;height:12px;background:#1e293b;border-radius:8px;overflow:hidden;margin:4px 0}.bossFill{height:100%}
+</style>
 </head>
 <body>
-<h1>🔥 BADY Saga</h1>
-<p>قلعة خصبة 7113</p>
-<div class="card"><h2 id="hi">مرحبا بيك!</h2><button onclick="Telegram.WebApp.close()">ابدأ اللعبة 🚀</button></div>
-<script>let tg=Telegram.WebApp;tg.expand();tg.ready();let u=tg.initDataUnsafe?.user;if(u)document.getElementById('hi').innerText='مرحبا '+u.first_name+' 👋';</script>
+<div id="app">
+<div class="header"><div>BADY <span style="color:#38bdf8">7113</span> 🏛️</div><div>⭐ <b id="score">0</b> 📍 <b id="lvl">1/9</b></div></div>
+<div id="s-start" class="screen active" style="display:flex"><div class="card"><div style="font-size:42px">🏛️✊</div><h2>قلعة الجردة 7113</h2><p style="color:#94a3b8;font-size:11px">9 مراحل - 5 صور 1910 - مطالب شعبية</p><button class="btn" onclick="startGame()">🚀 ابدأ</button></div></div>
+<div id="s-story" class="screen"><div class="card"><div style="font-size:44px" id="storyIcon">🏰</div><h2 id="storyTitle"></h2><p id="storyText" style="color:#94a3b8;font-size:13px"></p><button class="btn" onclick="nextLevel()">متابعة ⚔️</button></div></div>
+<div id="s-l1" class="screen"><div class="card"><div class="badge">1/9</div><h3>افتح البوابة! 🔨</h3><div class="progress-bg"><div id="p1" class="progress-fill"></div></div><span id="c1">0/40</span><div class="castle-btn" id="tapBtn">🏰</div></div></div>
+<div id="s-l2" class="screen"><div class="card"><div class="badge">2/9</div><h3>اجمع 25 حجر!</h3><div class="progress-bg"><div id="p2" class="progress-fill"></div></div><span id="c2">0/25</span><div id="catchArea"></div></div></div>
+<div id="s-l3" class="screen"><div class="card"><div class="badge">3/9</div><h3>اصطاد جواسيس!</h3><div class="progress-bg"><div id="p3" class="progress-fill"></div></div><span id="c3">0/18</span><div class="grid" id="grid"></div></div></div>
+<div id="s-l4" class="screen"><div class="card"><div class="badge">4/9</div><h3>المتاهة!</h3><div class="maze" id="maze"></div></div></div>
+<div id="s-l5" class="screen"><div class="card"><div class="badge">5/9</div><h3 id="qTitle"></h3><p id="qText"></p><div id="qOpts"></div></div></div>
+<div id="s-l6" class="screen"><div class="card"><div class="badge">6/9 - غول الفسفاط 👹</div><div class="bossBar"><div id="bossHp" class="bossFill" style="background:#ef4444;width:100%"></div></div><div style="font-size:48px">👹</div><div class="bossBar"><div id="myHp" class="bossFill" style="background:#22c55e;width:100%"></div></div><button class="btn" onclick="hitBoss()">⚔️ اضرب</button></div></div>
+<div id="s-l7" class="screen"><div class="card"><div class="badge">7/9 - الرمز 7113</div><div id="dots"></div><div id="codeDisp">----</div><div id="numpad" style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px"></div></div></div>
+<div id="s-history" class="screen"><div class="card"><div class="badge">8/9 - متحف 1910</div><h2>🏛️ ذاكرة قلعة الجردة</h2><img id="histImg" style="width:100%;height:200px;object-fit:cover;border-radius:14px" src="./images/buffet_gare.jpg"><div id="histTitle" style="font-weight:800"></div><div id="histDesc" style="font-size:11px;color:#94a3b8"></div><div style="display:flex;gap:8px"><button class="btn2 btn" style="flex:1" onclick="prevHist()">⬅️</button><button class="btn" style="flex:1" onclick="nextHist()">➡️</button></div><button class="btn" id="histNextBtn" style="display:none;margin-top:8px" onclick="showStory(8)">مطالب ✊</button></div></div>
+<div id="s-l8" class="screen"><div class="card"><div class="badge">9/9 - مطالب شعبية</div><h2>✊ مطالب قلعة خصبة 7113</h2><p>عندك <b id="pts">0</b> نقطة</p><div id="demandsList"></div><button class="btn" id="finishBtn" disabled onclick="finishDemands()">📜 اصدار وثيقة</button></div></div>
+<div id="s-win" class="screen"><div class="card"><h2>📜 وثيقة</h2><div id="docList" style="background:white;color:black;padding:10px;border-radius:10px;text-align:right"></div><button class="btn" onclick="alert('شارك t.me/badykalaabot/bady')">📤 شارك</button></div></div>
+</div>
+<script>
+let score=0,cur=0;
+const histImgs=["./images/buffet_gare.jpg","./images/puits_centre_1910.jpg","./images/maisons_ouvrieres.jpg","./images/panorama_2022.jpg","./images/mosquee_mine.jpg"];
+const histData=[{title:"بوفية المحطة 1910",year:"1910",desc:"مقهى المحطة"},{title:"البئر المركزي 1910",year:"1910",desc:"قلب المناجم"},{title:"ديار العمال",year:"1910",desc:"سكن جدودنا"},{title:"قلعة الجردة اليوم",year:"2022",desc:"بانوراما"},{title:"الجامع فوق المنجم",year:"2020",desc:"الإيمان فوق الثروة"}];
+let stories=[{icon:'🏰',title:'البوابة',text:'40 ضربة!'},{icon:'🪨',title:'البناء',text:'25 حجر!'},{icon:'🥷',title:'الجواسيس',text:'18!'},{icon:'🗺️',title:'السراديب',text:'متاهة!'},{icon:'📜',title:'الحكمة',text:'3 ألغاز!'},{icon:'☠️',title:'غول الفسفاط',text:'حارب!'},{icon:'🔐',title:'الرمز',text:'7113!'},{icon:'🏛️',title:'ذاكرة 1910',text:'صور حقيقية!'},{icon:'✊',title:'المطالب',text:'ملعب+تعويض+متنزه+شغل!'}];
+let demands=[{icon:'⚽',title:'ملعب معشب لشباب خصبة',desc:'شباب يلعب في التراب',cost:600,votes:287,done:false,featured:true},{icon:'☠️',title:'تعويض أضرار الفسفاط الصحية',desc:'أمراض من 1910-2024',cost:1000,votes:342,done:false,featured:true},{icon:'🏛️',title:'متنزه سياحي وثقافي - متحف 1910',desc:'حضارات + صور تاريخية',cost:800,votes:198,done:false,featured:true},{icon:'💼',title:'شغل للشباب ضد هجرة الأدمغة',desc:'شباب يهاجر',cost:900,votes:412,done:false,featured:true}];
+function up(s){score+=s;if(score<0)score=0;document.getElementById('score').innerText=score}
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.style.display='none');document.getElementById(id).style.display='flex'}
+function showStory(i){cur=i;document.getElementById('storyIcon').innerText=stories[i].icon;document.getElementById('storyTitle').innerText=stories[i].title;document.getElementById('storyText').innerText=stories[i].text;show('s-story')}
+function nextLevel(){if(cur===0)startL1();else if(cur===1)startL2();else if(cur===2)startL3();else if(cur===3)startL4();else if(cur===4)startL5();else if(cur===5)startL6();else if(cur===6)startL7();else if(cur===7)startHistory();else if(cur===8)startL8()}
+function startGame(){score=0;up(0);showStory(0)}
+let c1=0;function startL1(){show('s-l1');c1=0;document.getElementById('tapBtn').onclick=()=>{c1++;document.getElementById('c1').innerText=c1+'/40';document.getElementById('p1').style.width=c1/40*100+'%';if(c1>=40){up(400);showStory(1)}}}
+function startL2(){show('s-l2')} function startL3(){show('s-l3')} function startL4(){show('s-l4')} function startL5(){show('s-l5')} function startL6(){show('s-l6')} function startL7(){show('s-l7')}
+let hIdx=0;function startHistory(){show('s-history');hIdx=0;renderHist()}
+function renderHist(){document.getElementById('histImg').src=histImgs[hIdx];document.getElementById('histTitle').innerText=histData[hIdx].title;document.getElementById('histDesc').innerText=histData[hIdx].desc;if(hIdx>=2)document.getElementById('histNextBtn').style.display='block'}
+function nextHist(){if(hIdx<4){hIdx++;renderHist()}} function prevHist(){if(hIdx>0){hIdx--;renderHist()}}
+function startL8(){show('s-l8');renderDemands()}
+function renderDemands(){let l=document.getElementById('demandsList');l.innerHTML='';let d=0;demands.forEach((x,i)=>{let div=document.createElement('div');div.className='demand '+(x.featured?'featured ':'')+(x.done?'done':'');div.innerHTML=`<div>${x.icon} ${x.title} ${x.done?'✅':''} <button onclick="toggleDemand(${i})">${x.done?'تم':x.cost+' ⭐'}</button></div>`;l.appendChild(div);if(x.done)d++});document.getElementById('pts').innerText=score;if(d>=2){document.getElementById('finishBtn').disabled=false}}
+function toggleDemand(i){let d=demands[i];if(d.done){d.done=false;up(d.cost)}else{if(score<d.cost){alert('ناقص نقاط');return}d.done=true;up(-d.cost)}renderDemands()}
+function hitBoss(){up(100);showStory(6)}
+function finishDemands(){let done=demands.filter(d=>d.done);let list=document.getElementById('docList');list.innerHTML='';done.forEach(d=>{let p=document.createElement('div');p.innerText=d.title;list.appendChild(p)});show('s-win')}
+</script>
 </body>
 </html>
