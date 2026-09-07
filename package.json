@@ -1,5 +1,7 @@
 {
   "name": "bady",
   "version": "1.0.0",
-  "scripts": { "build": "echo ok" }
+  "scripts": {
+    "build": "mkdir -p public && cp index.html public/index.html"
+  }
 }
